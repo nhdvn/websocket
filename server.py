@@ -62,7 +62,7 @@ def listening(server):
                 ifile = open('404.html', 'rb')
                 header = 'HTTP/1.1 404 Not Found \n\n'
 
-        elif method == 'POST':
+        elif method == 'POST' and content == 'authen':
             data = re.split('=|&', request[-1])
             username, password = data[1], data[3]
             if username == 'admin' and password == 'admin':
