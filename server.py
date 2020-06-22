@@ -38,7 +38,11 @@ def parse(request):
     request = request.split(' ')
     method = request[0]
     content = request[1].lstrip('/')
-    data = request[-1].lstrip('en\r\n')
+    exist = request[-1].find('{')
+    if exist != -1:
+        data = request[-1][exist:]
+    else:
+        data = None
     try:
         data = json.loads(data)
     except:
