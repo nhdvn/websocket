@@ -1,7 +1,7 @@
-import socket
-import re
-import os
-import sys
+import socket, json, re, os, sys
+
+global login 
+login = False
 
 def mimetype(content):
     if content.endswith('.css'):
@@ -20,72 +20,76 @@ def mimetype(content):
         return 'text/txt'
     if content.endswith('.pdf'):
         return 'text/pdf'
-    if content.endswith('.pptx'):
-        return 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
 
 
 def render():
     files = os.listdir('sharing/')
-
     with open('files.html', 'w') as ifile:
         ifile.write('<html>')
         ifile.write('<body>')
-
         for name in sorted(files):
             ifile.write(f'<a href = "/sharing/{name}" > {name} </a> <br>')
-
         ifile.write('<body>')
         ifile.write('<html>')
 
     ifile.close()
 
 
-def listening(server):
-    while True:
-        connection, address = server.accept()
-        request = connection.recv(1024).decode('utf-8')
-        request = request.split(' ')
-        print(f'Receive request from {address[0]}:{address[1]} {request[0]} {request[1]}')
-        method, content = request[0], request[1].lstrip('/')
+def parse(request):
+    request = request.split(' ')
+    method = request[0]
+    content = request[1].lstrip('/')
+    data = request[-1].lstrip('en\r\n')
+    try:
+        data = json.loads(data)
+    except:
+        data = None
 
-        if method == 'GET' and content == 'files.html':
-            render()
+    return method, content, data
+
+
+def handle(client):
+    global login 
+    request = client.recv(1024).decode('utf-8')
+    method, content, data = parse(request)
+
+    if method == 'POST' and content == 'login':
+        if data['user'] == 'admin' and data['pswd'] == 'admin':
+            login = True
+        header = 'HTTP/1.1 200 OK Content-Type: application/json \n\n'
+        return header.encode('utf-8') + json.dumps(login).encode('utf-8')
+
+    if method == 'GET' and content == 'info.html':
+        if login == True:
+            ifile = open('info.html', 'rb')
+        else:
+            ifile = open('index.html', 'rb')
+        header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
+        return header.encode('utf-8') + ifile.read()
+
+    if method == 'GET':
+        if content == '': content = 'index.html'
+        try:
             ifile = open(content, 'rb')
-            header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
+            header = 'HTTP/1.1 200 OK Content-Type: ' + mimetype(content) + '\n\n'
+        except:
+            ifile = open('404.html', 'rb')
+            header = 'HTTP/1.1 404 Not Found \n\n'
+        return header.encode('utf-8') + ifile.read()
 
-        elif method == 'GET':
-            if content == '': content = 'index.html'
-            try:
-                ifile = open(content, 'rb')
-                header = 'HTTP/1.1 200 OK Content-Type: ' + mimetype(content) + '\n\n'
-            except:
-                ifile = open('404.html', 'rb')
-                header = 'HTTP/1.1 404 Not Found \n\n'
-
-        elif method == 'POST' and content == 'authen':
-            data = re.split('=|&', request[-1])
-            username, password = data[1], data[3]
-            if username == 'admin' and password == 'admin':
-                ifile = open('info.html', 'rb')
-                header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
-            else:
-                ifile = open('index.html', 'rb')
-                header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
- 
-        response = header.encode('utf-8') + ifile.read()
-        ifile.close()
-        connection.send(response)
-        connection.close()
 
 def main():
-    ip, port = '127.0.0.1', 8080
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind((ip, port))
+    server.bind(('127.0.0.1', 8080))
     server.listen()
-    print(f'Server is listening at {ip}:{port}')
-    listening(server)
+
+    while True:
+        client, port = server.accept()
+        print('receiving connection from', port)
+        response = handle(client)
+        client.send(response)
+        client.close()
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
