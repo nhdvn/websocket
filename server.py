@@ -8,9 +8,11 @@ def mimetype(content):
         return 'text/css'
     if content.endswith('.html'):
         return 'text/html'
-    if content.endswith('jpg'):
+    if content.endswith('.ico'):
+        return 'image/vnd.microsoft.icon' 
+    if content.endswith('.jpg'):
         return 'image/jpg'
-    if content.endswith('png'):
+    if content.endswith('.png'):
         return 'image/png'
     if content.endswith('.js'):
         return 'text/javascript'
@@ -22,6 +24,8 @@ def mimetype(content):
         return 'text/txt'
     if content.endswith('.pdf'):
         return 'text/pdf'
+    if content.endswith('.pptx'):
+        return 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
 
 
 def loopdir(ifile, path):
