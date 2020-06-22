@@ -14,6 +14,8 @@ def mimetype(content):
         return 'image/png'
     if content.endswith('.js'):
         return 'text/javascript'
+    if content.endswith('.py'):
+        return 'text/x-python'    
     if content.endswith('.ttf'):
         return 'font/ttf'
     if content.endswith('.txt'):
@@ -22,15 +24,41 @@ def mimetype(content):
         return 'text/pdf'
 
 
+def loopdir(ifile, path):
+    files = os.listdir(path)
+    for name in sorted(files):
+        if name == '.git': continue
+        folder = path + '/' + name
+        if os.path.isdir(folder):
+            ifile.write(f'<li class="folder">{name}')
+            ifile.write('<ul>')
+            loopdir(ifile, folder)
+            ifile.write('</ul>')
+            ifile.write('</li>')
+        else:
+            ifile.write('<li>')
+            ifile.write(f'<a href="{path}/{name}">{name}</a>')
+            ifile.write('</li>')
+            
+
+
 def render():
-    files = os.listdir('sharing/')
     with open('files.html', 'w') as ifile:
         ifile.write('<html>')
+        ifile.write('<head>')
+        ifile.write('<title>Files</title>')
+        ifile.write('<link rel="stylesheet" type="text/css" href="css/files.css">')
+        ifile.write('</head>')
+
         ifile.write('<body>')
-        for name in sorted(files):
-            ifile.write(f'<a href = "/sharing/{name}" > {name} </a> <br>')
-        ifile.write('<body>')
-        ifile.write('<html>')
+        ifile.write('<h2>Directory List</h2>')
+        ifile.write('<div class="box">')
+        ifile.write('<ul class="directory-list">')
+        loopdir(ifile, '.') # or ./sharing
+        ifile.write('</ul>')
+        ifile.write('</div>')
+        ifile.write('</body>')
+        ifile.write('</html>')
     ifile.close()
 
 
@@ -71,7 +99,6 @@ def handle(client):
         return header.encode('utf-8') + ifile.read()
 
     if method == 'GET' and content == 'files.html':
-        render()
         ifile = open('files.html', 'rb')
         header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
         return header.encode('utf-8') + ifile.read()
@@ -103,4 +130,6 @@ def main():
         client.close()
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": 
+    render()
+    main()
