@@ -31,7 +31,6 @@ def render():
             ifile.write(f'<a href = "/sharing/{name}" > {name} </a> <br>')
         ifile.write('<body>')
         ifile.write('<html>')
-
     ifile.close()
 
 
@@ -44,7 +43,7 @@ def parse(request):
         data = json.loads(data)
     except:
         data = None
-
+    print(method, content)
     return method, content, data
 
 
@@ -67,6 +66,12 @@ def handle(client):
         header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
         return header.encode('utf-8') + ifile.read()
 
+    if method == 'GET' and content == 'files.html':
+        render()
+        ifile = open('files.html', 'rb')
+        header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
+        return header.encode('utf-8') + ifile.read()
+
     if method == 'GET':
         if content == '': content = 'index.html'
         try:
@@ -84,9 +89,11 @@ def main():
     server.bind(('127.0.0.1', 8080))
     server.listen()
 
+    print('Server is listening at 127.0.0.1:8080')
+
     while True:
         client, port = server.accept()
-        print('receiving connection from', port)
+        print('Establish connection from', port, end = ' ')
         response = handle(client)
         client.send(response)
         client.close()
