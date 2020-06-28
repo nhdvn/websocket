@@ -58,7 +58,7 @@ def render():
         ifile.write('<h2>Directory List</h2>')
         ifile.write('<div class="box">')
         ifile.write('<ul class="directory-list">')
-        loopdir(ifile, '.') # or ./sharing
+        loopdir(ifile, './sharing')
         ifile.write('</ul>')
         ifile.write('</div>')
         ifile.write('</body>')
@@ -79,7 +79,7 @@ def parse(request):
         data = json.loads(data)
     except:
         data = None
-    print(method, content)
+    print(method, content, end = ' ')
     return method, content, data
 
 
@@ -111,7 +111,8 @@ def handle(client):
         return header.encode('utf-8') + ifile.read()
 
     if method == 'GET':
-        if content == '': content = 'index.html'
+        if content == '': 
+            content = 'index.html'
         try:
             ifile = open(content, 'rb')
             header = 'HTTP/1.1 200 OK Content-Type: ' + mimetype(content) + '\n\n'
@@ -133,9 +134,9 @@ def main():
         client, port = server.accept()
         print('Establish connection from', port, end = ' ')
         response = handle(client)
-        #if response == '':
-        #    continue
-        client.send(response)
+        print()
+        if response != '':
+            client.send(response)
         client.close()
     
 
