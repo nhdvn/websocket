@@ -85,9 +85,9 @@ def parse(request):
 
 def handle(client):
     global login 
-    request = client.recv(1024).decode('utf-8')
+    request = client.recv()
     if request == '':
-        return ''
+        return b''
     
     method, content, data = parse(request)
 
@@ -133,8 +133,8 @@ def main():
         client, port = server.accept()
         print('Establish connection from', port, end = ' ')
         response = handle(client)
-        if response == '':
-            continue
+        #if response == '':
+        #    continue
         client.send(response)
         client.close()
     
