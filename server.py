@@ -85,8 +85,10 @@ def parse(request):
 
 def handle(client):
     global login 
-    request = client.recv(1024).decode('utf-8')
-    if request == '':
+    client.settimeout(1)
+    try:
+        request = client.recv(1024).decode('utf-8')
+    except socket.timeout:
         return b''
     
     method, content, data = parse(request)
