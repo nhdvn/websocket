@@ -55,7 +55,7 @@ def render():
         ifile.write('</head>')
 
         ifile.write('<body>')
-        ifile.write('<h2>Directory List</h2>')
+        ifile.write('<h2>Sharing List</h2>')
         ifile.write('<div class="box">')
         ifile.write('<ul class="directory-list">')
         loopdir(ifile, './sharing')
@@ -108,6 +108,7 @@ def handle(client):
         return header.encode('utf-8') + ifile.read()
 
     if method == 'GET' and content == 'files.html':
+        render()
         ifile = open('files.html', 'rb')
         header = 'HTTP/1.1 200 OK Content-Type: text/html \n\n'
         return header.encode('utf-8') + ifile.read()
@@ -143,6 +144,4 @@ def main():
     
 
 
-if __name__ == "__main__": 
-    render()
-    main()
+if __name__ == "__main__": main()
