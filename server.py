@@ -1,4 +1,4 @@
-import socket, json, re, os, sys
+import socket, json, re, os, sys, urllib.parse
 
 global login 
 login = False
@@ -24,6 +24,8 @@ def mimetype(content):
         return 'text/txt'
     if content.endswith('.pdf'):
         return 'text/pdf'
+    if content.endswith('.ppt'):
+        return 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     if content.endswith('.pptx'):
         return 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
 
@@ -119,6 +121,7 @@ def handle(client):
         if content == '': 
             content = 'index.html'
         try:
+            content = urllib.parse.unquote(content)
             ifile = open(content, 'rb')
             header = 'HTTP/1.1 200 OK Content-Type: ' + mimetype(content) + '\n\n'
         except:
