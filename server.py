@@ -96,6 +96,8 @@ def handle(client):
     if method == 'POST' and content == 'login':
         if data['user'] == 'admin' and data['pswd'] == 'admin':
             login = True
+        else:
+            login = False
         header = 'HTTP/1.1 200 OK Content-Type: application/json \n\n'
         return header.encode('utf-8') + json.dumps(login).encode('utf-8')
 
