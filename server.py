@@ -43,7 +43,7 @@ def loopdir(ifile, path):
             ifile.write('</li>')
         else:
             ifile.write('<li>')
-            ifile.write(f'<a href="{path}/{name}">{name}</a>')
+            ifile.write(f'<a href="{path}/{name}" download>{name}</a>')
             ifile.write('</li>')
             
 
