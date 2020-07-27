@@ -1,0 +1,33 @@
+AF_INET -> ipv4
+AF_INT6 -> ipv6
+
+SOCK_STREAM -> tcp
+SOCK_DGRAM -> udp
+
+Internet Protocol version 4 (IPv4): AF_INET
+IPX/SPX: AF_IPX
+AppleTalk: AF_APPLETALK
+NetBIOS: AF_NETBIOS
+Internet Protocol version 6 (IPv6): AF_INET6
+Infrared Data Association (IrDA): AF_IRDA
+Bluetooth: AF_BTH
+
+| Address   |       Socket Type        |
+| Family    | SOCK_DGRAM | SOCK_STREAM | 
+|-----------|------------|-------------|
+| IPX/SPX   | SPX        | IPX         |
+| NetBIOS   | NetBIOS    | n/a         |
+| IPv4      | UDP        | TCP         |
+| AppleTalk | DDP        | ADSP        |
+| IPv6      | UDP        | TCP         |
+| IrDA      | IrLMP      | IrTTP       |
+| Bluetooth | ?          | RFCOMM      |
+
+sudo lsof -i:8080
+netstat -
+
+The SO_REUSEADDR flag tells the kernel to reuse a local socket in TIME_WAIT state, without waiting for its natural timeout to expire.
+
+The bind() method of Python's socket class assigns an IP address and a port number to a socket instance
+
+Enable a server to accept connections
